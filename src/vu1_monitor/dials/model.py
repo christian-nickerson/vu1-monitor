@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
-from config.settings import settings
+from vu1_monitor.config.settings import settings
 
 
 @dataclass

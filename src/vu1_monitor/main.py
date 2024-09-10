@@ -2,9 +2,10 @@ import time
 
 import click
 import psutil
-from config.settings import settings
-from dials.client import VU1Client
-from dials.model import DialType
+
+from vu1_monitor.config.settings import settings
+from vu1_monitor.dials.client import VU1Client
+from vu1_monitor.dials.model import DialType
 
 
 @click.command()
@@ -12,6 +13,8 @@ from dials.model import DialType
 def main(interval: int) -> None:
     address = f"http://{settings.server.hostname}:{settings.server.port}"
     client = VU1Client(address, settings.key)
+
+    client.set_background(DialType.CPU, 20, 20, 20)
 
     while True:
         cpu = int(psutil.cpu_percent())

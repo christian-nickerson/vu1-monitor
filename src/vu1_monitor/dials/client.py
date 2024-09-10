@@ -1,6 +1,7 @@
 import httpx
-from dials.model import Dial, DialType
-from exceptions.dials import DialNotFound
+
+from vu1_monitor.dials.model import Dial, DialType
+from vu1_monitor.exceptions.dials import DialNotFound
 
 
 class VU1Client:
@@ -36,5 +37,13 @@ class VU1Client:
         path = f"/api/v0/dial/{self.__dials[dial].uid}/set"
         with httpx.Client(base_url=self.__addr, params=self.__auth) as client:
             response = client.get(path, params={"value": value})
+        if response.status_code != 200:
+            response.raise_for_status()
+
+    def set_background(self, dial: DialType, red: int, green: int, blue: int) -> None:
+        path = f"/api/v0/dial/{self.__dials[dial].uid}/backlight"
+        with httpx.Client(base_url=self.__addr, params=self.__auth) as client:
+            params = {"red": red, "green": green, "blue": blue}
+            response = client.get(path, params=params)
         if response.status_code != 200:
             response.raise_for_status()
