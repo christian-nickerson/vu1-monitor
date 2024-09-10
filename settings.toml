@@ -1,0 +1,15 @@
+[server]
+hostname = "localhost"
+port = 5340
+
+[cpu]
+name = "CPU"
+
+[gpu]
+name = "GPU"
+
+[memory]
+name = "Memory"
+
+[network]
+name = "Network"

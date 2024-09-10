@@ -1,0 +1,60 @@
+[tool.poetry]
+name = "vu1-monitor"
+version = "0.0.1"
+description = ""
+authors = ["Christian Nickerson <christian_nickerson@hotmail.com>"]
+license = "Apache Licence 2.0"
+readme = "README.md"
+
+packages = [{ include = "vu1_monitor", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+click = "^8.1.7"
+httpx = "^0.27.2"
+dynaconf = "^3.2.6"
+psutil = "^6.0.0"
+
+[tool.poetry.scripts]
+vu1-monitor = "vu1_monitor.main:main"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.4"
+black = "^24.8.0"
+mypy = "^1.11.2"
+pytest = "^8.3.3"
+coverage = "^7.6.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 119
+
+[tool.ruff]
+line-length = 119
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B"]
+ignore = ["E501"]
+unfixable = ["B"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402", "F401"]
+"embedding/src/proto/*" = ["B028", "F541"]
+"**/{tests,docs,tools}/*" = ["E402"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+mypy_path = ["src/", "tests/"]
+strict_optional = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--cov", "--verbose"]
+norecursedirs = ["dist", "build"]
+pythonpath = ["src/"]

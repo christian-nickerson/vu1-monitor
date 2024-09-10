@@ -1,0 +1,2 @@
+class DialNotFound(Exception):
+    pass

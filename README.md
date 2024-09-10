@@ -1,2 +1,3 @@
-# vu1-monitor
-Agnostic hardware monitoring CLI application for VU1 Dials
+# VU1-Monitor
+
+A platform agnostic CLI tool for monitoring hardware usage using the VU1 Dials.
