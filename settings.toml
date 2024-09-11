@@ -9,7 +9,7 @@ name = "CPU"
 name = "GPU"
 
 [memory]
-name = "Memory"
+name = "MEMORY"
 
 [network]
-name = "Network"
+name = "NETWORK"
