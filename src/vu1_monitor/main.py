@@ -1,3 +1,4 @@
+import logging
 import sys
 import time
 
@@ -15,7 +16,7 @@ DIALS = [item.value for item in DialType]
 COLOURS = [item.name for item in Colours]
 BRIGHT = [item.name for item in Bright]
 
-logger = create_logger("VU1-Monitor")
+logger = create_logger("VU1-Monitor", logging.getLevelName(settings.server.logging_level))
 client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
 
 
@@ -76,9 +77,12 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
     :param net: Flag for Network Dial updates, defaults to False.
     """
     logger.info("starting VU1-Monitor..")
+
     if True not in [cpu, gpu, mem, net]:
         logger.critical("at least one dial must be set to update")
         sys.exit(1)
+
+    bytes_recv = psutil.net_io_counters().bytes_recv
 
     while True:
         try:
@@ -90,7 +94,10 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
             if mem:
                 client.set_dial(DialType.MEMORY, int(psutil.virtual_memory().percent))
             if net:
-                client.set_dial(DialType.NETWORK, int(psutil.cpu_percent()))
+                bytes_recv_updated = psutil.net_io_counters().bytes_recv
+                mb_rev = (bytes_recv_updated - bytes_recv) / (1024 * 1024)
+                client.set_dial(DialType.NETWORK, int(mb_rev))
+                bytes_recv = bytes_recv_updated
         except DialNotImplemented as e:
             logger.critical(f"failed to update {e.dial.value}: dial not found")
             sys.exit(1)

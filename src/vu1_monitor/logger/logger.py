@@ -12,7 +12,7 @@ class Formatter(logging.Formatter):
         return super().format(record)
 
 
-def create_logger(name: str, level: int = logging.INFO) -> logging.Logger:
+def create_logger(name: str, level: int | str = logging.INFO) -> logging.Logger:
     """Create a logger instance
 
     :param name: name of logger
