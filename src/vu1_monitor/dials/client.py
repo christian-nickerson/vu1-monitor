@@ -1,6 +1,8 @@
+from pathlib import Path
+
 import httpx
 
-from vu1_monitor.dials.models import Dial, DialType
+from vu1_monitor.dials.models import Dial, DialImage, DialType
 from vu1_monitor.exceptions.dials import DialNotFound, DialNotImplemented
 
 
@@ -45,6 +47,7 @@ class VU1Client:
 
         :param dial: Dial to update
         :param value: 0-100 value to set dial at
+        :raises DialNotImplemented: Raised when dial selected is not found.
         """
         try:
             path = f"/api/v0/dial/{self.__dials[dial].uid}/set"
@@ -59,19 +62,15 @@ class VU1Client:
 
     def reset_dials(self) -> None:
         """Reset the values of all dials to 0"""
-        with httpx.Client(base_url=self.__addr, params=self.__auth) as client:
-            for dial in self.__dials:
-                params = {"value": 0}
-                path = f"/api/v0/dial/{self.__dials[dial].uid}/set"
-                response = client.get(path, params=params)
-                if response.status_code != 200:
-                    response.raise_for_status()
+        for dial in self.__dials:
+            self.set_dial(dial, 0)
 
     def set_background(self, dial: DialType, colour: tuple[int, ...]) -> None:
         """Set background colour of a dial
 
         :param dial: Dial to update
         :param colour: A tuple of (red, green, blue) RGB percent values (0-100)
+        :raises DialNotImplemented: Raised when dial selected is not found.
         """
         try:
             path = f"/api/v0/dial/{self.__dials[dial].uid}/backlight"
@@ -87,10 +86,29 @@ class VU1Client:
 
     def reset_backgrounds(self) -> None:
         """Reset the backgrounds of all dials to off"""
+        for dial in self.__dials:
+            self.set_background(dial, (0, 0, 0))
+
+    def set_image(self, dial: DialType, image_path: Path) -> None:
+        """Set an image for a dial
+
+        :param dial: :param dial: Dial to update.
+        :param image_path: _description_
+        :raises DialNotImplemented: Raised when dial selected is not found.
+        """
+        try:
+            path = f"/api/v0/dial/{self.__dials[dial].uid}/image/set"
+        except KeyError as e:
+            raise DialNotImplemented(f"{dial.value} dial is not set up", dial) from e
+
         with httpx.Client(base_url=self.__addr, params=self.__auth) as client:
-            for dial in self.__dials:
-                params = {"red": 0, "green": 0, "blue": 0}
-                path = f"/api/v0/dial/{self.__dials[dial].uid}/backlight"
-                response = client.get(path, params=params)
-                if response.status_code != 200:
-                    response.raise_for_status()
+            files = {"imgfile": open(image_path, "rb")}
+            response = client.post(path, files=files)
+
+        if response.status_code != 200:
+            response.raise_for_status()
+
+    def reset_images(self) -> None:
+        """Reset all dials to their default images"""
+        for dial in self.__dials.keys():
+            self.set_image(dial, DialImage[dial].value)

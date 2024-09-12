@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum, StrEnum
+from pathlib import Path
 
 from vu1_monitor.config.settings import settings
 
@@ -22,6 +23,14 @@ class DialType(StrEnum):
     NETWORK: str = settings.network.name
 
 
+class DialImage(Enum):
+
+    CPU: Path = Path("src/vu1_monitor/static/cpu-load.png")
+    GPU: Path = Path("src/vu1_monitor/static/gpu-load.png")
+    MEMORY: Path = Path("src/vu1_monitor/static/blank.png")
+    NETWORK: Path = Path("src/vu1_monitor/static/blank.png")
+
+
 class Colours(Enum):
 
     WHITE: tuple[int, ...] = (100, 100, 100)
@@ -36,3 +45,10 @@ class Bright(Enum):
     MID: float = 0.5
     LOW: float = 0.2
     OFF: float = 0.0
+
+
+class Element(StrEnum):
+
+    DIAL: str = "dial"
+    BACKGROUND: str = "background"
+    IMAGE: str = "image"

@@ -1,22 +1,24 @@
-import logging
 import sys
 import time
+from pathlib import Path
 
 import click
 import GPUtil
 import psutil
 
+from vu1_monitor.compression.files import extract_tarfile
 from vu1_monitor.config.settings import settings
 from vu1_monitor.dials.client import VU1Client
-from vu1_monitor.dials.models import Bright, Colours, DialType
+from vu1_monitor.dials.models import Bright, Colours, DialType, Element
 from vu1_monitor.exceptions.dials import DialNotImplemented
 from vu1_monitor.logger.logger import create_logger
 
 DIALS = [item.value for item in DialType]
 COLOURS = [item.name for item in Colours]
 BRIGHT = [item.name for item in Bright]
+ELEMENTS = [item.value for item in Element]
 
-logger = create_logger("VU1-Monitor", logging.getLevelName(settings.server.logging_level))
+logger = create_logger("VU1-Monitor", settings.server.logging_level)
 client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
 
 
@@ -43,22 +45,29 @@ def background(colour: str, brightness: str, dial: DialType | None) -> None:
         for type in DialType:
             try:
                 client.set_background(type, adj_colour)
-                logger.info(f"{type.value} set to {colour}")
+                logger.debug(f"{type.value} set to {colour}")
             except DialNotImplemented:
                 logger.warning(f"{type.value} not set: dial not found")
     else:
         try:
             client.set_background(DialType(dial), adj_colour)
-            logger.info(f"{dial} set to {colour}")
+            logger.debug(f"{dial} set to {colour}")
         except DialNotImplemented:
             logger.error(f"{dial} not set: dial not found")
 
 
-@main.command(help="reset all dials (position & colour)")
-def reset() -> None:
+@main.command(help="reset all dials to default")
+@click.argument("element", type=Element, nargs=1, required=True)
+def reset(element: Element) -> None:
     """reset all dials"""
-    client.reset_dials()
-    client.reset_backgrounds()
+    match element:
+        case Element.DIAL:
+            client.reset_dials()
+        case Element.BACKGROUND:
+            client.reset_backgrounds()
+        case Element.IMAGE:
+            extract_tarfile(Path("src/vu1_monitor/static/static.tgz"))
+            client.reset_images()
 
 
 @main.command(help="start VU1-Monitoring")
@@ -87,12 +96,14 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
     while True:
         try:
             if cpu:
-                client.set_dial(DialType.CPU, int(psutil.cpu_percent()))
+                cpu_percent = int(psutil.cpu_percent())
+                client.set_dial(DialType.CPU, cpu_percent)
             if gpu:
-                gpus = GPUtil.getGPUs()
-                client.set_dial(DialType.GPU, int(gpus[0].load))
+                gpu_percent = int(GPUtil.getGPUs()[0].load)
+                client.set_dial(DialType.GPU, gpu_percent)
             if mem:
-                client.set_dial(DialType.MEMORY, int(psutil.virtual_memory().percent))
+                memory_percent = int(psutil.virtual_memory().percent)
+                client.set_dial(DialType.MEMORY, memory_percent)
             if net:
                 bytes_recv_updated = psutil.net_io_counters().bytes_recv
                 mb_rev = (bytes_recv_updated - bytes_recv) / (1024 * 1024)
@@ -102,7 +113,7 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
             logger.critical(f"failed to update {e.dial.value}: dial not found")
             sys.exit(1)
 
-        logger.info("update successful")
+        logger.debug("update successful")
         time.sleep(interval)
 
 
