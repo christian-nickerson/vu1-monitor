@@ -13,10 +13,8 @@ from vu1_monitor.dials.models import Bright, Colours, DialType, Element
 from vu1_monitor.exceptions.dials import DialNotImplemented
 from vu1_monitor.logger.logger import create_logger
 
-DIALS = [item.value for item in DialType]
 COLOURS = [item.name for item in Colours]
 BRIGHT = [item.name for item in Bright]
-ELEMENTS = [item.value for item in Element]
 
 logger = create_logger("VU1-Monitor", settings.server.logging_level)
 client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
@@ -31,7 +29,7 @@ def main() -> None:
 @main.command(help="set the background colour of a dial")
 @click.option("--colour", "-c", default=Colours.WHITE.name, type=click.Choice(COLOURS))
 @click.option("--brightness", "-b", default=Bright.LOW.name, type=click.Choice(BRIGHT))
-@click.option("--dial", "-d", default=None, type=click.Choice(DIALS))
+@click.option("--dial", "-d", default=None, type=DialType)
 def background(colour: str, brightness: str, dial: DialType | None) -> None:
     """Set background colour for a dial
 
