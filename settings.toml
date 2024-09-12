@@ -1,7 +1,7 @@
 [server]
 hostname = "localhost"
 port = 5340
-logging_level = "WARNING"
+logging_level = "INFO"
 
 [cpu]
 name = "CPU"
