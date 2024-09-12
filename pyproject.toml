@@ -16,6 +16,7 @@ dynaconf = "^3.2.6"
 psutil = "^6.0.0"
 gputil = "^1.4.0"
 setuptools = "^74.1.2"
+pillow = "^10.4.0"
 
 [tool.poetry.scripts]
 vu1-monitor = "vu1_monitor.main:main"

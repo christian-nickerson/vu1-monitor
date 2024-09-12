@@ -5,6 +5,7 @@ from pathlib import Path
 import click
 import GPUtil
 import psutil
+from PIL import Image
 
 from vu1_monitor.compression.files import extract_tarfile
 from vu1_monitor.config.settings import settings
@@ -15,6 +16,7 @@ from vu1_monitor.logger.logger import create_logger
 
 COLOURS = [item.name for item in Colours]
 BRIGHT = [item.name for item in Bright]
+FILETYPES = (".png", ".jpg", "jpeg")
 
 logger = create_logger("VU1-Monitor", settings.server.logging_level)
 client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
@@ -43,29 +45,35 @@ def background(colour: str, brightness: str, dial: DialType | None) -> None:
         for type in DialType:
             try:
                 client.set_background(type, adj_colour)
-                logger.debug(f"{type.value} set to {colour}")
+                logger.debug(f"{type.value} background set to {colour}")
             except DialNotImplemented:
-                logger.warning(f"{type.value} not set: dial not found")
+                logger.warning(f"{type.value} background not set: dial not found")
     else:
         try:
             client.set_background(DialType(dial), adj_colour)
-            logger.debug(f"{dial} set to {colour}")
+            logger.debug(f"{dial} background set to {colour}")
         except DialNotImplemented:
-            logger.error(f"{dial} not set: dial not found")
+            logger.error(f"{dial} background not set: dial not found")
 
 
-@main.command(help="reset all dials to default")
-@click.argument("element", type=Element, nargs=1, required=True)
-def reset(element: Element) -> None:
-    """reset all dials"""
-    match element:
-        case Element.DIAL:
-            client.reset_dials()
-        case Element.BACKGROUND:
-            client.reset_backgrounds()
-        case Element.IMAGE:
-            extract_tarfile(Path("src/vu1_monitor/static/static.tgz"))
-            client.reset_images()
+@main.command(help="set the image of a dial")
+@click.argument("filename", type=click.Path(exists=True))
+@click.option("--dial", "-d", required=True, type=DialType)
+def image(filename: str, dial: DialType) -> None:
+    """Set the image for a dial
+
+    :param dial: :param dial: Dial to set
+    """
+    assert filename.endswith(FILETYPES), f"file must be of type: {FILETYPES}"
+
+    width, height = Image.open(filename).size
+    assert (width * height) == (200 * 144), "image must be exactly 144 x 200 pixels"
+
+    try:
+        client.set_image(dial, Path(filename))
+        logger.debug(f"{dial} image set to {filename}")
+    except DialNotImplemented:
+        logger.error(f"{dial} image not set: dial not found")
 
 
 @main.command(help="start VU1-Monitoring")
@@ -113,6 +121,20 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
 
         logger.debug("update successful")
         time.sleep(interval)
+
+
+@main.command(help="reset all dials to default")
+@click.argument("element", type=Element, required=True)
+def reset(element: Element) -> None:
+    """reset all dials"""
+    match element:
+        case Element.DIAL:
+            client.reset_dials()
+        case Element.BACKGROUND:
+            client.reset_backgrounds()
+        case Element.IMAGE:
+            extract_tarfile(Path("src/vu1_monitor/static/static.tgz"))
+            client.reset_images()
 
 
 if __name__ == "__main__":
