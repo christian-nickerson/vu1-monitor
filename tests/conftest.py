@@ -1,5 +1,5 @@
 import pytest
-from dynaconf import settings
+from dynaconf import settings  # type: ignore
 
 
 @pytest.fixture(scope="session", autouse=True)

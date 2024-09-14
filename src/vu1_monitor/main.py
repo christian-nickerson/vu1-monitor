@@ -3,7 +3,7 @@ import time
 from pathlib import Path
 
 import click
-import GPUtil
+import GPUtil  # type: ignore
 import psutil
 from PIL import Image
 

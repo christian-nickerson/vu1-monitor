@@ -1,6 +1,6 @@
 import os
 
-from dynaconf import Dynaconf
+from dynaconf import Dynaconf  # type: ignore
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -11,6 +11,3 @@ settings = Dynaconf(
     environments=True,
     env_switcher="VU1_ENV",
 )
-
-# `envvar_prefix` = export envvars with `export DYNACONF_FOO=bar`.
-# `settings_files` = Load these files in the order.
