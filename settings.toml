@@ -2,6 +2,7 @@
 hostname = "localhost"
 port = 5340
 logging_level = "INFO"
+key = "cTpAWYuRpA2zx75Yh961Cg" # defult VU-Server key - please use your own key
 
 [default.cpu]
 name = "CPU"

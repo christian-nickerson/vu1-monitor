@@ -38,7 +38,7 @@ def backlight(colour: str, brightness: str, dial: DialType | None) -> None:
     :param brightness: Brightness level to set dial to, defaults to LOW.
     :param dial: Dial to set, defaults to None (sets all dials).
     """
-    client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
+    client = VU1Client(settings.server.hostname, settings.server.port, settings.server.key)
     adj_colour = tuple([int(value * Bright[brightness].value) for value in Colours[colour].value])
 
     if not dial:
