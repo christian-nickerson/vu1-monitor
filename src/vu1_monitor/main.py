@@ -64,7 +64,7 @@ def image(filename: str, dial: DialType) -> None:
 
     :param dial: :param dial: Dial to set
     """
-    client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
+    client = VU1Client(settings.server.hostname, settings.server.port, settings.server.key)
     assert filename.endswith(FILETYPES), f"file must be of type: {FILETYPES}"
 
     width, height = Image.open(filename).size
@@ -92,7 +92,7 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
     :param mem: Flag for Memory Dial updates, defaults to False.
     :param net: Flag for Network Dial updates, defaults to False.
     """
-    client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
+    client = VU1Client(settings.server.hostname, settings.server.port, settings.server.key)
     logger.info("starting VU1-Monitor..")
 
     if True not in [cpu, gpu, mem, net]:
@@ -129,7 +129,7 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
 @click.argument("element", type=Element, required=True)
 def reset(element: Element) -> None:
     """reset all dials"""
-    client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
+    client = VU1Client(settings.server.hostname, settings.server.port, settings.server.key)
     match element:
         case Element.DIAL:
             client.reset_dials()
