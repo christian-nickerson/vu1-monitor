@@ -27,8 +27,8 @@ class DialImage(Enum):
 
     CPU: Path = Path("src/vu1_monitor/static/cpu-load.png")
     GPU: Path = Path("src/vu1_monitor/static/gpu-load.png")
-    MEMORY: Path = Path("src/vu1_monitor/static/blank.png")
-    NETWORK: Path = Path("src/vu1_monitor/static/blank.png")
+    MEMORY: Path = Path("src/vu1_monitor/static/mem-load.png")
+    NETWORK: Path = Path("src/vu1_monitor/static/net-down.png")
 
 
 class Colours(Enum):

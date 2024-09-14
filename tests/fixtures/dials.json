@@ -1,0 +1,50 @@
+{
+    "status": "ok",
+    "message": "",
+    "data": [
+        {
+            "uid": "590056000650564139323920",
+            "dial_name": "CPU",
+            "value": 31,
+            "backlight": {
+                "red": 39,
+                "green": 3,
+                "blue": 39
+            },
+            "image_file": "img_590056000650564139323920"
+        },
+        {
+            "uid": "4C0065000650564139323920",
+            "dial_name": "MEMORY",
+            "value": 40,
+            "backlight": {
+                "red": 39,
+                "green": 3,
+                "blue": 39
+            },
+            "image_file": "img_4C0065000650564139323920"
+        },
+        {
+            "uid": "3E0075000650564139323920",
+            "dial_name": "GPU",
+            "value": 16,
+            "backlight": {
+                "red": 39,
+                "green": 3,
+                "blue": 39
+            },
+            "image_file": "img_3E0075000650564139323920"
+        },
+        {
+            "uid": "550075000650564139323920",
+            "dial_name": "NETWORK",
+            "value": 2,
+            "backlight": {
+                "red": 39,
+                "green": 11,
+                "blue": 17
+            },
+            "image_file": "img_550075000650564139323920"
+        }
+    ]
+}

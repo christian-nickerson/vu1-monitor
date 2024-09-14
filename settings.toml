@@ -1,16 +1,16 @@
-[server]
+[default.server]
 hostname = "localhost"
 port = 5340
 logging_level = "INFO"
 
-[cpu]
+[default.cpu]
 name = "CPU"
 
-[gpu]
+[default.gpu]
 name = "GPU"
 
-[memory]
+[default.memory]
 name = "MEMORY"
 
-[network]
+[default.network]
 name = "NETWORK"

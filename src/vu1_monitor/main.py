@@ -28,12 +28,12 @@ def main() -> None:
     pass
 
 
-@main.command(help="set the background colour of a dial")
+@main.command(help="set the backlight colour and brightness of a dial")
 @click.option("--colour", "-c", default=Colours.WHITE.name, type=click.Choice(COLOURS))
 @click.option("--brightness", "-b", default=Bright.LOW.name, type=click.Choice(BRIGHT))
 @click.option("--dial", "-d", default=None, type=DialType)
-def background(colour: str, brightness: str, dial: DialType | None) -> None:
-    """Set background colour for a dial
+def backlight(colour: str, brightness: str, dial: DialType | None) -> None:
+    """Set backlight colour and brightness for a dial
 
     :param colour: Pre-set colour to set dial to, defaults to WHITE.
     :param brightness: Brightness level to set dial to, defaults to LOW.
@@ -44,16 +44,16 @@ def background(colour: str, brightness: str, dial: DialType | None) -> None:
     if not dial:
         for type in DialType:
             try:
-                client.set_background(type, adj_colour)
-                logger.debug(f"{type.value} background set to {colour}")
+                client.set_backlight(type, adj_colour)
+                logger.debug(f"{type.value} backlight set to {colour}")
             except DialNotImplemented:
-                logger.warning(f"{type.value} background not set: dial not found")
+                logger.warning(f"{type.value} backlight not set: dial not found")
     else:
         try:
-            client.set_background(DialType(dial), adj_colour)
-            logger.debug(f"{dial} background set to {colour}")
+            client.set_backlight(DialType(dial), adj_colour)
+            logger.debug(f"{dial} backlight set to {colour}")
         except DialNotImplemented:
-            logger.error(f"{dial} background not set: dial not found")
+            logger.error(f"{dial} backlight not set: dial not found")
 
 
 @main.command(help="set the image of a dial")
@@ -131,7 +131,7 @@ def reset(element: Element) -> None:
         case Element.DIAL:
             client.reset_dials()
         case Element.BACKGROUND:
-            client.reset_backgrounds()
+            client.reset_backlights()
         case Element.IMAGE:
             extract_tarfile(Path("src/vu1_monitor/static/static.tgz"))
             client.reset_images()
