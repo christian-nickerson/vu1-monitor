@@ -130,7 +130,7 @@ def reset(element: Element) -> None:
     match element:
         case Element.DIAL:
             client.reset_dials()
-        case Element.BACKGROUND:
+        case Element.BACKLIGHT:
             client.reset_backlights()
         case Element.IMAGE:
             extract_tarfile(Path("src/vu1_monitor/static/static.tgz"))
