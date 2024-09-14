@@ -11,12 +11,12 @@ on:
 
 jobs:
   test:
-    name: Python testing
+    name: tsting & linting
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -26,19 +26,19 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
+    - name: install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install poetry
         poetry config virtualenvs.create false
         poetry install
 
-    - name: Linting tests
+    - name: linting tests
       run: |
         poetry run black src/ tests/ --check
         poetry run ruff check src/ tests/
         poetry run mypy src/ tests/
 
-    - name: Unit tests
+    - name: unit tests
       run: |
         poetry run pytest tests
