@@ -168,7 +168,7 @@ cython_debug/
 .ruff_cache
 
 # images
-*.png
+src/vu1_monitor/static/*.png
 
 # mac files
 *.DS_store
