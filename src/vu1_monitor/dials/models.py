@@ -15,7 +15,7 @@ class Dial:
     image_file: str
 
 
-class DialType(Enum):
+class DialType(str, Enum):
 
     CPU: str = settings.cpu.name
     GPU: str = settings.gpu.name
@@ -23,7 +23,7 @@ class DialType(Enum):
     NETWORK: str = settings.network.name
 
 
-class DialImage(Enum):
+class DialImage(Path, Enum):
 
     CPU: Path = Path("src/vu1_monitor/static/cpu-load.png")
     GPU: Path = Path("src/vu1_monitor/static/gpu-load.png")
@@ -31,7 +31,7 @@ class DialImage(Enum):
     NETWORK: Path = Path("src/vu1_monitor/static/net-down.png")
 
 
-class Colours(Enum):
+class Colours(tuple[int, ...], Enum):
 
     WHITE: tuple[int, ...] = (100, 100, 100)
     RED: tuple[int, ...] = (100, 0, 0)
@@ -39,7 +39,7 @@ class Colours(Enum):
     BLUE: tuple[int, ...] = (0, 0, 100)
 
 
-class Bright(Enum):
+class Bright(float, Enum):
 
     MAX: float = 1.0
     MID: float = 0.5
@@ -47,7 +47,7 @@ class Bright(Enum):
     OFF: float = 0.0
 
 
-class Element(Enum):
+class Element(str, Enum):
 
     DIAL: str = "dial"
     BACKGROUND: str = "background"
