@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum, StrEnum
+from enum import Enum
 from pathlib import Path
 
 from vu1_monitor.config.settings import settings
@@ -15,7 +15,7 @@ class Dial:
     image_file: str
 
 
-class DialType(StrEnum):
+class DialType(Enum):
 
     CPU: str = settings.cpu.name
     GPU: str = settings.gpu.name
@@ -47,7 +47,7 @@ class Bright(Enum):
     OFF: float = 0.0
 
 
-class Element(StrEnum):
+class Element(Enum):
 
     DIAL: str = "dial"
     BACKGROUND: str = "background"
