@@ -19,7 +19,6 @@ BRIGHT = [item.name for item in Bright]
 FILETYPES = (".png", ".jpg", "jpeg")
 
 logger = create_logger("VU1-Monitor", settings.server.logging_level)
-client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
 
 
 @click.group
@@ -39,6 +38,7 @@ def backlight(colour: str, brightness: str, dial: DialType | None) -> None:
     :param brightness: Brightness level to set dial to, defaults to LOW.
     :param dial: Dial to set, defaults to None (sets all dials).
     """
+    client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
     adj_colour = tuple([int(value * Bright[brightness].value) for value in Colours[colour].value])
 
     if not dial:
@@ -64,6 +64,7 @@ def image(filename: str, dial: DialType) -> None:
 
     :param dial: :param dial: Dial to set
     """
+    client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
     assert filename.endswith(FILETYPES), f"file must be of type: {FILETYPES}"
 
     width, height = Image.open(filename).size
@@ -91,6 +92,7 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
     :param mem: Flag for Memory Dial updates, defaults to False.
     :param net: Flag for Network Dial updates, defaults to False.
     """
+    client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
     logger.info("starting VU1-Monitor..")
 
     if True not in [cpu, gpu, mem, net]:
@@ -127,6 +129,7 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
 @click.argument("element", type=Element, required=True)
 def reset(element: Element) -> None:
     """reset all dials"""
+    client = VU1Client(settings.server.hostname, settings.server.port, settings.key)
     match element:
         case Element.DIAL:
             client.reset_dials()
