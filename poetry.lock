@@ -680,6 +680,17 @@ files = [
 ]
 
 [[package]]
+name = "types-pillow"
+version = "10.2.0.20240822"
+description = "Typing stubs for Pillow"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-Pillow-10.2.0.20240822.tar.gz", hash = "sha256:559fb52a2ef991c326e4a0d20accb3bb63a7ba8d40eb493e0ecb0310ba52f0d3"},
+    {file = "types_Pillow-10.2.0.20240822-py3-none-any.whl", hash = "sha256:d9dab025aba07aeb12fd50a6799d4eac52a9603488eca09d7662543983f16c5d"},
+]
+
+[[package]]
 name = "types-psutil"
 version = "6.0.0.20240901"
 description = "Typing stubs for psutil"
@@ -704,4 +715,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "a10d0a1ba6632bcb495960742e78b3a355c24bbdba37d1ce524175d4aa61d372"
+content-hash = "860fa8bbc816715e63400ad3e4dfafefd0f7ac473c5e29a8f436de19ae20ccde"
