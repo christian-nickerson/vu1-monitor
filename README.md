@@ -111,3 +111,9 @@ vu1-monitor reset image
 
 > [!NOTE]
 > `vu1-monitor` identifies specific Dials by their name, as configured in `vu-server`. Please make sure that each dial name matches what is expected by `vu1-monitor`
+
+## Supported hardware
+
+`vu1-monitor` supports OS agnostic tooling, particularly across Linux, MacOS & Linux. However, `vu1-monitor` is only tested and maintained on MacOS & Linux (`vu-server` had a default demo app for windows).
+
+Currently, `vu1-monitor` supports NVIDIA GPU monitoring only. AMD & Apple GPU monitoring will be coming in later releases.
