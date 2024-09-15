@@ -125,7 +125,7 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
                 cpu_percent = int(psutil.cpu_percent())
                 client.set_dial(DialType.CPU, cpu_percent)
             if gpu:
-                gpu_percent = int(GPUtil.getGPUs()[0].load)
+                gpu_percent = int(GPUtil.getGPUs()[0].load * 100)
                 client.set_dial(DialType.GPU, gpu_percent)
             if mem:
                 memory_percent = int(psutil.virtual_memory().percent)
