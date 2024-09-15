@@ -5,6 +5,15 @@ description = "A CLI application for monitoring hardware with VU1-Dials"
 authors = ["Christian Nickerson <christian_nickerson@hotmail.com>"]
 license = "Apache Licence 2.0"
 readme = "README.md"
+repository = "https://github.com/christian-nickerson/vu1-monitor"
+keywords = ["vu1", "vu1-dials", "monitoring"]
+include = ["LICENSE"]
+classifiers = [
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Topic :: System :: Monitoring",
+]
+
 
 packages = [{ include = "vu1_monitor", from = "src" }]
 
