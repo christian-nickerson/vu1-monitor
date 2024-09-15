@@ -13,7 +13,7 @@ settings = Dynaconf(
     validators=[
         # server
         Validator("server.hostname", default="localhost"),
-        Validator("server.port", default=5430),
+        Validator("server.port", default=5340),
         Validator("server.logging_level", default="INFO"),
         Validator("server.key", default="cTpAWYuRpA2zx75Yh961Cg"),
         # dials
