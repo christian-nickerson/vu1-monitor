@@ -15,4 +15,5 @@ class DialNotImplemented(Exception):
 class ServerNotFound(Exception):
 
     def __init__(self, message: str = "VU Server is unreachable. Is it on?"):
-        super().__init__(message)
+        self.message = message
+        super().__init__(self.message)

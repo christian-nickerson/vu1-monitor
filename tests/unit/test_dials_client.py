@@ -6,11 +6,7 @@ from pytest_httpx import HTTPXMock
 
 from vu1_monitor.dials.client import VU1Client
 from vu1_monitor.dials.models import Dial, DialType
-from vu1_monitor.exceptions.dials import (
-    DialNotFound,
-    DialNotImplemented,
-    ServerNotFound,
-)
+from vu1_monitor.exceptions.dials import DialNotFound, DialNotImplemented
 
 
 @pytest.fixture
@@ -50,13 +46,6 @@ def test_load_dials(httpx_mock: HTTPXMock, client: VU1Client, dial_body: dict):
     assert len(client.dials) == len(dial_body["data"])
     for dial in client.dials:
         assert isinstance(client.dials[dial], Dial)
-
-
-def test_load_dials_server_off(httpx_mock: HTTPXMock, client: VU1Client, dial_body: dict):
-    """test load dials fails correctly when server not online"""
-    httpx_mock.add_response(status_code=500, json=dial_body)
-    with pytest.raises(ServerNotFound):
-        client._load_dials()
 
 
 def test_load_dials_no_dials_configured(httpx_mock: HTTPXMock, client: VU1Client, dial_body: dict):
@@ -112,13 +101,6 @@ def test_set_dial_non_200(httpx_mock: HTTPXMock, client_loaded: VU1Client, value
         client_loaded.set_dial(DialType.CPU, 50)
 
 
-def test_set_dial_500(httpx_mock: HTTPXMock, client_loaded: VU1Client, value_body: dict):
-    """test set_dial call raises ServerNotFound on 500"""
-    httpx_mock.add_response(status_code=500, json=value_body)
-    with pytest.raises(ServerNotFound):
-        client_loaded.set_dial(DialType.CPU, 50)
-
-
 ###########################
 ### Set Backlight tests ###
 ###########################
@@ -148,13 +130,6 @@ def test_set_backlight_non_200(httpx_mock: HTTPXMock, client_loaded: VU1Client, 
     """test set_backlight call raises HTTPError on non-200"""
     httpx_mock.add_response(status_code=400, json=backlight_body)
     with pytest.raises(HTTPError):
-        client_loaded.set_backlight(DialType.CPU, (50, 50, 50))
-
-
-def test_set_backlight_500(httpx_mock: HTTPXMock, client_loaded: VU1Client, backlight_body: dict):
-    """test set_backlight call raises ServerNotFound on 500"""
-    httpx_mock.add_response(status_code=500, json=backlight_body)
-    with pytest.raises(ServerNotFound):
         client_loaded.set_backlight(DialType.CPU, (50, 50, 50))
 
 
@@ -188,11 +163,4 @@ def test_set_image_non_200(httpx_mock: HTTPXMock, client_loaded: VU1Client, imag
     """test set_image call raises HTTPError on non-200"""
     httpx_mock.add_response(status_code=400, json=image_body)
     with pytest.raises(HTTPError):
-        client_loaded.set_image(DialType.CPU, image_file)
-
-
-def test_set_image_500(httpx_mock: HTTPXMock, client_loaded: VU1Client, image_body: dict, image_file: Path):
-    """test set_image call raises ServerNotFound on 500"""
-    httpx_mock.add_response(status_code=500, json=image_body)
-    with pytest.raises(ServerNotFound):
         client_loaded.set_image(DialType.CPU, image_file)

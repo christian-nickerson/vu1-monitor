@@ -1,3 +1,4 @@
+import functools
 import sys
 import time
 from pathlib import Path
@@ -11,7 +12,7 @@ from vu1_monitor.compression.files import extract_tarfile
 from vu1_monitor.config.settings import settings
 from vu1_monitor.dials.client import VU1Client
 from vu1_monitor.dials.models import Bright, Colours, DialType, Element
-from vu1_monitor.exceptions.dials import DialNotImplemented
+from vu1_monitor.exceptions.dials import DialNotImplemented, ServerNotFound
 from vu1_monitor.logger.logger import create_logger
 
 COLOURS = [item.name for item in Colours]
@@ -19,6 +20,20 @@ BRIGHT = [item.name for item in Bright]
 FILETYPES = (".png", ".jpg", "jpeg")
 
 logger = create_logger("VU1-Monitor", settings.server.logging_level)
+
+
+def server_not_found(func):
+    @functools.wraps(func)
+    def handle_not_found_errors(*args, **kwargs):
+        """handle server not found errors"""
+        try:
+            value = func(*args, **kwargs)
+            return value
+        except ServerNotFound as e:
+            logger.critical(e.message)
+            sys.exit(1)
+
+    return handle_not_found_errors
 
 
 @click.group
@@ -31,6 +46,7 @@ def main() -> None:
 @click.option("--colour", "-c", default=Colours.WHITE.name, type=click.Choice(COLOURS))
 @click.option("--brightness", "-b", default=Bright.LOW.name, type=click.Choice(BRIGHT))
 @click.option("--dial", "-d", default=None, type=DialType)
+@server_not_found
 def backlight(colour: str, brightness: str, dial: DialType | None) -> None:
     """Set backlight colour and brightness for a dial
 
@@ -59,6 +75,7 @@ def backlight(colour: str, brightness: str, dial: DialType | None) -> None:
 @main.command(help="set the image of a dial")
 @click.argument("filename", type=click.Path(exists=True))
 @click.option("--dial", "-d", required=True, type=DialType)
+@server_not_found
 def image(filename: str, dial: DialType) -> None:
     """Set the image for a dial
 
@@ -83,6 +100,7 @@ def image(filename: str, dial: DialType) -> None:
 @click.option("--gpu/--no-gpu", default=False, help=f"update {DialType.GPU.value} dial")
 @click.option("--mem/--no-mem", default=False, help=f"update {DialType.MEMORY.value} dial")
 @click.option("--net/--no-net", default=False, help=f"update {DialType.NETWORK.value} dial")
+@server_not_found
 def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
     """Start VU1-Monitoring
 
@@ -127,6 +145,7 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
 
 @main.command(help="reset all dials to default")
 @click.argument("element", type=Element, required=True)
+@server_not_found
 def reset(element: Element) -> None:
     """reset all dials"""
     client = VU1Client(settings.server.hostname, settings.server.port, settings.server.key)

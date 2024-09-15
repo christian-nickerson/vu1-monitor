@@ -1,3 +1,4 @@
+import functools
 from pathlib import Path
 
 import httpx
@@ -10,6 +11,19 @@ from vu1_monitor.exceptions.dials import (
 )
 
 TYPES = [item.value for item in DialType]
+
+
+def server_conn(func):
+    @functools.wraps(func)
+    def handle_conn_errors(*args, **kwargs):
+        """handle connection errors"""
+        try:
+            value = func(*args, **kwargs)
+            return value
+        except httpx.ConnectError as e:
+            raise ServerNotFound from e
+
+    return handle_conn_errors
 
 
 class VU1Client:
@@ -44,19 +58,18 @@ class VU1Client:
         self.__dials = dials
         return dials
 
+    @server_conn
     def get_dials(self) -> list[dict]:
         """get list of all available dials"""
         with httpx.Client(base_url=self.__addr, params=self.__auth) as client:
             response = client.get("/api/v0/dial/list")
 
         if response.status_code != 200:
-            if response.status_code == 500:
-                raise ServerNotFound
-            else:
-                response.raise_for_status()
+            response.raise_for_status()
 
         return response.json()["data"]
 
+    @server_conn
     def set_dial(self, dial: DialType, value: int) -> dict:
         """Set the value of a dial
 
@@ -74,10 +87,7 @@ class VU1Client:
             response = client.get(path, params={"value": value})
 
         if response.status_code != 200:
-            if response.status_code == 500:
-                raise ServerNotFound
-            else:
-                response.raise_for_status()
+            response.raise_for_status()
 
         return response.json()
 
@@ -86,6 +96,7 @@ class VU1Client:
         for dial in self.__dials:
             self.set_dial(dial, 0)
 
+    @server_conn
     def set_backlight(self, dial: DialType, colour: tuple[int, ...]) -> dict:
         """Set backlight colour of a dial
 
@@ -104,10 +115,7 @@ class VU1Client:
             response = client.get(path, params=params)
 
         if response.status_code != 200:
-            if response.status_code == 500:
-                raise ServerNotFound
-            else:
-                response.raise_for_status()
+            response.raise_for_status()
 
         return response.json()
 
@@ -116,6 +124,7 @@ class VU1Client:
         for dial in self.__dials:
             self.set_backlight(dial, (0, 0, 0))
 
+    @server_conn
     def set_image(self, dial: DialType, image_path: Path) -> dict:
         """Set an image for a dial
 
@@ -134,10 +143,7 @@ class VU1Client:
             response = client.post(path, files=files)
 
         if response.status_code != 200:
-            if response.status_code == 500:
-                raise ServerNotFound
-            else:
-                response.raise_for_status()
+            response.raise_for_status()
 
         return response.json()
 
