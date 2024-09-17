@@ -1,6 +1,6 @@
 import statistics
 
-import GPUtil
+import GPUtil  # type: ignore
 
 from vu1_monitor.models.models import GPUBackend
 
@@ -27,7 +27,7 @@ def _get_nvidia_utilisation() -> float:
 
 def _get_amd_utilistion() -> float:
     """return AMD GPU utilisation (all devices). Loads library lazily to avoid device errors if not present."""
-    from pyadl import ADLManager
+    from pyadl import ADLManager  # type: ignore
 
     device_list = ADLManager.getInstance().getDevices()
     utilisation = [device.getCurrentUsage() for device in device_list]

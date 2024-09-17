@@ -1,4 +1,4 @@
-import GPUtil
+import GPUtil  # type: ignore
 import pytest
 from pytest_mock import MockFixture
 
