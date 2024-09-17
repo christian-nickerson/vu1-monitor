@@ -19,7 +19,7 @@ The VU1 Dials come with a server application and demo monitoring app out of the 
 
     To run `vu-server`, you can follow the [instructions to install and run the application](https://vudials.com/)
 
-4. GPU support is handled by differently per device type.
+4. GPU support is handled differently per device type.
 
     - Nvidia GPUs will need the `nvidia-smi`.
     - AMD GPUs are supported natively through their drivers
