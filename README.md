@@ -59,6 +59,16 @@ vu1-monitor run --no-cpu --gpu --mem --net
 vu1-monitor run --interval 1
 ```
 
+`vu1-monitor` uses configuration to understand what GPU backend to use. To update this, you can set an envrionment varibale:
+
+```bash
+# set GPU backed to NVIDIA (Default)
+export VU1__GPU__BACKEND=nvidia
+
+# set GPU backed to AMD
+export VU1__GPU__BACKEND=amd
+```
+
 ### Backlight
 
 `vu1-monitor` provides a series of pre-set backlight colours and brightness profiles for each / all dials.
@@ -111,6 +121,7 @@ vu1-monitor reset image
 | `VU1__SERVER__KEY` | The API key to authenticate with VU-Server. The default value is the default value of VU-Server, please generate a new key in the VU UI Console and set as your new key | `cTpAWYuRpA2zx75Yh961Cg` |
 | `VU1__CPU__NAME` | The name of the Dial assigned to CPU monitoring | `CPU` |
 | `VU1__GPU__NAME` | The name of the Dial assigned to GPU monitoring | `GPU` |
+| `VU1__GPU__BACKEND` | The device type of the GPU. Valid values are: `nvidia`, `amd` | `nvidia` |
 | `VU1__MEMORY__NAME` | The name of the Dial assigned to Memory monitoring | `MEMORY` |
 | `VU1__NETWORK__NAME` | The name of the Dial assigned to Network monitoring | `NETWORK` |
 
