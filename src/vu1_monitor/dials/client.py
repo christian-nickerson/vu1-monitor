@@ -1,5 +1,7 @@
 import functools
+import time
 from pathlib import Path
+from typing import Any, Callable
 
 import httpx
 
@@ -13,17 +15,29 @@ from vu1_monitor.exceptions.dials import (
 TYPES = [item.value for item in DialType]
 
 
-def server_conn(func):
-    @functools.wraps(func)
-    def handle_conn_errors(*args, **kwargs):
-        """handle connection errors"""
-        try:
-            value = func(*args, **kwargs)
-            return value
-        except httpx.ConnectError as e:
-            raise ServerNotFound from e
+def server_handler(timeout_retries: int = 3, sleep: int = 2) -> Callable:
+    """decorator for handling server errors"""
 
-    return handle_conn_errors
+    def server_decorator(func) -> Callable:
+        @functools.wraps(func)
+        def handle_errors(*args, **kwargs) -> Any:
+            """handle errors"""
+            try:
+                return func(*args, **kwargs)
+            except httpx.ConnectError as e:
+                raise ServerNotFound from e
+            except httpx.TimeoutException as e:
+                # retry on timeout
+                for _ in range(timeout_retries):
+                    try:
+                        return func(*args, **kwargs)
+                    except httpx.TimeoutException:
+                        time.sleep(sleep)
+                raise e
+
+        return handle_errors
+
+    return server_decorator
 
 
 class VU1Client:
@@ -55,10 +69,10 @@ class VU1Client:
         if len(dials) <= 0:
             raise DialNotFound("no known dials found")
 
-        self.__dials = dials
+        self.__dials: dict = dials
         return dials
 
-    @server_conn
+    @server_handler(5)
     def get_dials(self) -> list[dict]:
         """get list of all available dials"""
         with httpx.Client(base_url=self.__addr, params=self.__auth) as client:
@@ -69,7 +83,7 @@ class VU1Client:
 
         return response.json()["data"]
 
-    @server_conn
+    @server_handler(5)
     def set_dial(self, dial: DialType, value: int) -> dict:
         """Set the value of a dial
 
@@ -96,7 +110,7 @@ class VU1Client:
         for dial in self.__dials:
             self.set_dial(dial, 0)
 
-    @server_conn
+    @server_handler(5)
     def set_backlight(self, dial: DialType, colour: tuple[int, ...]) -> dict:
         """Set backlight colour of a dial
 
@@ -124,7 +138,7 @@ class VU1Client:
         for dial in self.__dials:
             self.set_backlight(dial, (0, 0, 0))
 
-    @server_conn
+    @server_handler(5)
     def set_image(self, dial: DialType, image_path: Path) -> dict:
         """Set an image for a dial
 

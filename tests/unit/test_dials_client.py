@@ -1,12 +1,17 @@
 from pathlib import Path
 
+import httpx
 import pytest
 from httpx import HTTPError
 from pytest_httpx import HTTPXMock
 
-from vu1_monitor.dials.client import VU1Client
+from vu1_monitor.dials.client import VU1Client, server_handler
 from vu1_monitor.dials.models import Dial, DialType
-from vu1_monitor.exceptions.dials import DialNotFound, DialNotImplemented
+from vu1_monitor.exceptions.dials import (
+    DialNotFound,
+    DialNotImplemented,
+    ServerNotFound,
+)
 
 
 @pytest.fixture
@@ -18,6 +23,40 @@ def client() -> VU1Client:
 def client_loaded(httpx_mock: HTTPXMock, dial_body: dict) -> VU1Client:
     httpx_mock.add_response(json=dial_body)
     return VU1Client("test", 5430, "test")
+
+
+##################################
+### Server Conn Error Handling ###
+##################################
+
+
+def test_server_conn_error(httpx_mock: HTTPXMock) -> None:
+    """test server_conn handles connection errors correctly"""
+    httpx_mock.add_exception(httpx.ConnectError("test"))
+    httpx_mock.add_response()
+
+    @server_handler()
+    def request_test():
+        with httpx.Client() as client:
+            return client.get("http://test")
+
+    with pytest.raises(ServerNotFound):
+        request_test()
+
+
+def test_server_timeout_error(httpx_mock: HTTPXMock) -> None:
+    """test server_conn handles timeout errors correctly"""
+    for _ in range(2):
+        httpx_mock.add_exception(httpx.TimeoutException("test"))
+    httpx_mock.add_response(status_code=200)
+
+    @server_handler(2)
+    def request_test():
+        with httpx.Client() as client:
+            return client.get("http://test")
+
+    response = request_test()
+    assert response.status_code == 200
 
 
 #############################
