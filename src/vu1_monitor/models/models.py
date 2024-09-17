@@ -52,3 +52,10 @@ class Element(str, Enum):
     DIAL: str = "dial"
     BACKLIGHT: str = "backlight"
     IMAGE: str = "image"
+
+
+class GPUBackend(str, Enum):
+
+    NVIDIA: str = "nvidia"
+    AMD: str = "amd"
+    METAL: str = "metal"

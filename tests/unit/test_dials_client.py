@@ -6,12 +6,12 @@ from httpx import HTTPError
 from pytest_httpx import HTTPXMock
 
 from vu1_monitor.dials.client import VU1Client, server_handler
-from vu1_monitor.dials.models import Dial, DialType
 from vu1_monitor.exceptions.dials import (
     DialNotFound,
     DialNotImplemented,
     ServerNotFound,
 )
+from vu1_monitor.models.models import Dial, DialType
 
 
 @pytest.fixture
