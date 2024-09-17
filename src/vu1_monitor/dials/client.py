@@ -5,12 +5,12 @@ from typing import Any, Callable
 
 import httpx
 
-from vu1_monitor.dials.models import Dial, DialImage, DialType
 from vu1_monitor.exceptions.dials import (
     DialNotFound,
     DialNotImplemented,
     ServerNotFound,
 )
+from vu1_monitor.models.models import Dial, DialImage, DialType
 
 TYPES = [item.value for item in DialType]
 

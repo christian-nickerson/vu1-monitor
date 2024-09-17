@@ -1,4 +1,4 @@
-from vu1_monitor.dials.models import DialType
+from vu1_monitor.models.models import DialType
 
 
 class DialNotFound(Exception):

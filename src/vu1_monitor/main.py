@@ -4,16 +4,16 @@ import time
 from pathlib import Path
 
 import click
-import GPUtil  # type: ignore
 import psutil
 from PIL import Image
 
 from vu1_monitor.compression.files import extract_tarfile
 from vu1_monitor.config.settings import settings
 from vu1_monitor.dials.client import VU1Client
-from vu1_monitor.dials.models import Bright, Colours, DialType, Element
 from vu1_monitor.exceptions.dials import DialNotImplemented, ServerNotFound
 from vu1_monitor.logger.logger import create_logger
+from vu1_monitor.metrics.gpu import get_gpu_utilisation
+from vu1_monitor.models.models import Bright, Colours, DialType, Element
 
 COLOURS = [item.name for item in Colours]
 BRIGHT = [item.name for item in Bright]
@@ -125,7 +125,7 @@ def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
                 cpu_percent = int(psutil.cpu_percent())
                 client.set_dial(DialType.CPU, cpu_percent)
             if gpu:
-                gpu_percent = int(GPUtil.getGPUs()[0].load * 100)
+                gpu_percent = int(get_gpu_utilisation(settings.gpu.backend))
                 client.set_dial(DialType.GPU, gpu_percent)
             if mem:
                 memory_percent = int(psutil.virtual_memory().percent)

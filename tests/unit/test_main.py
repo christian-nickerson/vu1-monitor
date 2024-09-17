@@ -5,8 +5,8 @@ from click.testing import CliRunner
 from pytest_mock import MockFixture
 
 from vu1_monitor.dials.client import VU1Client
-from vu1_monitor.dials.models import Bright, Colours, DialType
 from vu1_monitor.main import backlight, image
+from vu1_monitor.models.models import Bright, Colours, DialType
 
 
 @pytest.fixture
