@@ -553,6 +553,16 @@ files = [
 test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
 
 [[package]]
+name = "pyadl"
+version = "0.1"
+description = "A simple Python Wrapper for the AMD/ATI ADL lib."
+optional = false
+python-versions = "*"
+files = [
+    {file = "pyadl-0.1.tar.gz", hash = "sha256:8c76c809cfdcb1c40eb2af1dfb3fbb5c265d0431fa3c1645cb65709e353f9d87"},
+]
+
+[[package]]
 name = "pytest"
 version = "8.3.3"
 description = "pytest: simple powerful testing with Python"
@@ -732,4 +742,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "a79fd3f1fa866b40d5eb33631fbffa5c0c9c8e274eb36e0b0cacc998eb1b5e16"
+content-hash = "929ee258f91649fea67a4c94173a400cbbbf248119475fac412c3b19b55c768d"
