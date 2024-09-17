@@ -19,6 +19,11 @@ The VU1 Dials come with a server application and demo monitoring app out of the 
 
     To run `vu-server`, you can follow the [instructions to install and run the application](https://vudials.com/)
 
+4. GPU support is handled by differently per device type.
+
+    - Nvidia GPUs will need the `nvidia-smi`.
+    - AMD GPUs are supported natively through their drivers
+
 ### Install
 
 To install `vu1-monitor` run the following:
@@ -116,4 +121,4 @@ vu1-monitor reset image
 
 `vu1-monitor` supports OS agnostic tooling, particularly across Linux, MacOS & Linux. However, `vu1-monitor` is only tested and maintained on MacOS & Linux (`vu-server` had a default demo app for windows).
 
-Currently, `vu1-monitor` supports NVIDIA GPU monitoring only. AMD & Apple GPU monitoring will be coming in later releases.
+Currently, `vu1-monitor` supports NVIDIA & AMD GPU monitoring only. Apple GPU monitoring will be coming in later releases.
