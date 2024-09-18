@@ -1,3 +1,6 @@
+[defautl]
+name = "VU1-Monitor"
+
 [default.server]
 hostname = "localhost"
 port = 5340
