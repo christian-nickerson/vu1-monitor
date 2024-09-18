@@ -7,10 +7,10 @@ from pathlib import Path
 import psutil
 from PIL import Image
 
-from vu1_monitor.compression import extract_tarfile
 from vu1_monitor.config import settings
 from vu1_monitor.dials import VU1Client
 from vu1_monitor.exceptions import DialNotImplemented, ServerNotFound
+from vu1_monitor.files import extract_tarfile
 from vu1_monitor.metrics import get_gpu_utilisation
 from vu1_monitor.models import Bright, Colours, DialType, Element
 
