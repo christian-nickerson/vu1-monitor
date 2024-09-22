@@ -12,6 +12,7 @@ name = "CPU"
 
 [default.gpu]
 name = "GPU"
+backend = "nvidia"
 
 [default.memory]
 name = "MEMORY"

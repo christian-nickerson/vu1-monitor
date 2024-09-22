@@ -79,19 +79,20 @@ def set_image(filename: str, dial: DialType) -> None:
 
 
 @server_not_found
-def start_monitoring(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) -> None:
+def start_monitoring(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool, auto: bool) -> None:
     """Start VU1-Monitoring
 
-    :param interval: Wait interval between each update (seconds), defaults to 2.
-    :param cpu: Flag for CPU Dial updates, defaults to True.
-    :param gpu: Flag for GPU Dial updates, defaults to False.
-    :param mem: Flag for Memory Dial updates, defaults to False.
-    :param net: Flag for Network Dial updates, defaults to False.
+    :param interval: Wait interval between each update (seconds)
+    :param cpu: Flag for CPU Dial updates
+    :param gpu: Flag for GPU Dial updates
+    :param mem: Flag for Memory Dial updates
+    :param net: Flag for Network Dial updates
+    :param auto: Flag for automatic dial updates *checks for all existing dials and overrides negative dial flags)
     """
     client = VU1Client(settings.server.hostname, settings.server.port, settings.server.key)
-    logger.info("starting VU1-Monitor..")
+    logger.info("running VU1-Monitor..")
 
-    if True not in [cpu, gpu, mem, net]:
+    if True not in [cpu, gpu, mem, net, auto]:
         logger.critical("at least one dial must be set to update")
         sys.exit(1)
 
@@ -99,20 +100,24 @@ def start_monitoring(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool) 
 
     while True:
         try:
-            if cpu:
+            if cpu or (auto and client.check_dial(DialType.CPU)):
                 cpu_percent = int(psutil.cpu_percent())
                 client.set_dial(DialType.CPU, cpu_percent)
-            if gpu:
+
+            if gpu or (auto and client.check_dial(DialType.GPU)):
                 gpu_percent = int(get_gpu_utilisation(settings.gpu.backend))
                 client.set_dial(DialType.GPU, gpu_percent)
-            if mem:
+
+            if mem or (auto and client.check_dial(DialType.MEMORY)):
                 memory_percent = int(psutil.virtual_memory().percent)
                 client.set_dial(DialType.MEMORY, memory_percent)
-            if net:
+
+            if net or (auto and client.check_dial(DialType.NETWORK)):
                 bytes_recv_updated = psutil.net_io_counters().bytes_recv
                 mb_rev = (bytes_recv_updated - bytes_recv) / (1024 * 1024)
                 client.set_dial(DialType.NETWORK, int(mb_rev))
                 bytes_recv = bytes_recv_updated
+
         except DialNotImplemented as e:
             logger.critical(f"failed to update {e.dial.value}: dial not found")
             sys.exit(1)

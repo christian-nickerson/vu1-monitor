@@ -53,6 +53,14 @@ class VU1Client:
         """available dials"""
         return self.__dials
 
+    def check_dial(self, dial: DialType) -> bool:
+        """Check dial type is present
+
+        :param dial: dial to check
+        :return: boolean for present or not
+        """
+        return dial in self.__dials
+
     def _load_dials(self) -> dict:
         """build a dictionary of available dials
 
@@ -64,7 +72,7 @@ class VU1Client:
         if len(resp) <= 0:
             raise DialNotFound("no dials returned from VU Server")
 
-        dials = {d["dial_name"]: Dial(**d) for d in resp if d["dial_name"] in TYPES}
+        dials = {DialType(d["dial_name"]): Dial(**d) for d in resp if d["dial_name"] in TYPES}
 
         if len(dials) <= 0:
             raise DialNotFound("no known dials found")

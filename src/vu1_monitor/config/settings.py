@@ -20,7 +20,7 @@ settings = Dynaconf(
         # dials
         Validator("cpu.name", default="CPU"),
         Validator("gpu.name", default="GPU"),
-        Validator("gpu.backend", default=None),
+        Validator("gpu.backend", default="nvidia"),
         Validator("memory.name", default="MEMORY"),
         Validator("network.name", default="NETWORK"),
     ],

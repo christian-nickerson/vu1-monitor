@@ -108,6 +108,17 @@ def test_load_dials_no_dials_correctly_configured(httpx_mock: HTTPXMock, client:
         client._load_dials()
 
 
+def test_check_dial_exists(httpx_mock: HTTPXMock, client_loaded: VU1Client):
+    """test check_dial returns true"""
+    assert client_loaded.check_dial(DialType.CPU) is True
+
+
+def test_check_dial_not_exists(httpx_mock: HTTPXMock, client_loaded: VU1Client):
+    """test check_dial returns false"""
+    client_loaded.dials.pop(DialType.CPU.value, None)
+    assert client_loaded.check_dial(DialType.CPU) is False
+
+
 ######################
 ### Set Dial tests ###
 ######################
