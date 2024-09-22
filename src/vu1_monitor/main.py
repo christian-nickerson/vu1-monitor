@@ -1,11 +1,6 @@
-import os
-import signal
-import subprocess
-
 import click
 
 from vu1_monitor.config import settings
-from vu1_monitor.files import check_pid, read_lock, write_lock
 from vu1_monitor.handlers import (
     reset_dials,
     run_as_child,
