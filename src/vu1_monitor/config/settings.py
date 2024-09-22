@@ -11,6 +11,7 @@ settings = Dynaconf(
     environments=True,
     env_switcher="VU1_ENV",
     validators=[
+        Validator("name", default="VU1-Monitor"),
         # server
         Validator("server.hostname", default="localhost"),
         Validator("server.port", default=5340),
@@ -19,7 +20,7 @@ settings = Dynaconf(
         # dials
         Validator("cpu.name", default="CPU"),
         Validator("gpu.name", default="GPU"),
-        Validator("gpu.backend", default=None),
+        Validator("gpu.backend", default="nvidia"),
         Validator("memory.name", default="MEMORY"),
         Validator("network.name", default="NETWORK"),
     ],

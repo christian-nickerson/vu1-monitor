@@ -115,6 +115,7 @@ vu1-monitor reset image
 
 | Environment Variable Name | Description | Default Value |
 | :--- | :--- | :--- |
+| `VU1__NAME` | The name of the application | `VU1-Monitor` |
 | `VU1__SERVER__HOSTNAME` | The hostname of the VU-Server | `localhost` |
 | `VU1__SERVER__PORT` | The port of the VU-Server | 5430 |
 | `VU1__SERVER__LOGGING_LEVEL` | The logging level of VU1-Monitor | `INFO` |

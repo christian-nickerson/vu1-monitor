@@ -1,3 +1,6 @@
+[defautl]
+name = "VU1-Monitor"
+
 [default.server]
 hostname = "localhost"
 port = 5340
@@ -9,6 +12,7 @@ name = "CPU"
 
 [default.gpu]
 name = "GPU"
+backend = "nvidia"
 
 [default.memory]
 name = "MEMORY"
