@@ -1,6 +1,6 @@
 # VU1-Monitor
 
-A CLI application for monitoring hardware using [VU1 Dials](https://streacom.com/products/vu1-dynamic-analogue-dials/)
+A CLI application for monitoring hardware using [VU1 Dials](https://streacom.com/products/vu1-dynamic-analogue-dials/).
 
 ## What is this?
 
@@ -14,15 +14,15 @@ The VU1 Dials come with a server application and demo monitoring app out of the 
 
     `pipx` is used to install Python CLI applications globally while still isolating them in virtual environments. `pipx` will manage upgrades and uninstalls of `vu1-monitor`. If `pipx` is not already installed, you can follow any of the options in the official [pipx installation instructions](https://pipx.pypa.io/stable/installation/).
 
-2. `vu1-monitor` is a python CLI application and supports 3.10+
-3. `vu1-monitor` is a "VU" application and expects the `vu-server` to be running
+2. `vu1-monitor` is a python CLI application and supports 3.10+.
+3. `vu1-monitor` is a "VU" application and expects the `vu-server` to be running.
 
     To run `vu-server`, you can follow the [instructions to install and run the application](https://vudials.com/)
 
 4. GPU support is handled differently per device type.
 
     - Nvidia GPUs will need the `nvidia-smi`.
-    - AMD GPUs are supported natively through their drivers
+    - AMD GPUs are supported natively through their drivers.
 
 ### Install
 
@@ -37,16 +37,30 @@ pipx install vu1-monitor
 To start monitoring, you can run the following:
 
 ```bash
-vu1-monitor run
+vu1-monitor start
 ```
 
 ## Commands
 
-`vu1-monitor` provides several utilities for interacting and configuring your VU1-Dials
+`vu1-monitor` provides several utilities for interacting and configuring your VU1-Dials.
+
+### Start & Stop
+
+`vu1-monitor` can be simply started (to run in the background) and stopped:
+
+```bash
+# starts monitoring of all available dials
+vu1-monitor start
+
+# stop monitoring all available dials
+vu1-monitor stop 
+```
+
+`start` will automatically detect what dials can be updated based on their name.
 
 ### Run
 
-`vu1-monitor` by default will only update the CPU dial. Run can also update other dials and alter the update interval speed:
+`vu1-monitor` provides a `run` utility that runs monitoring within the CLI. By default it will only update the CPU dial. `run` can also update other dials and alter the update interval speed:
 
 ```bash
 # runs all available dials, including CPU
@@ -92,7 +106,7 @@ vu1-monitor image /your/file/path/dial.png --dial NETWORK
 ```
 
 > [!NOTE]
-> VU1 Dials expect their background images to be either in `.png` or `.jpg` formats and must be exactly 200 x 144 pixels. `vu1-monitor` and the `vu-server` are strict about this requirement and will reject anything outside of this
+> VU1 Dials expect their background images to be either in `.png` or `.jpg` formats and must be exactly 200 x 144 pixels. `vu1-monitor` and the `vu-server` are strict about this requirement and will reject anything outside of this.
 
 ### Reset
 
