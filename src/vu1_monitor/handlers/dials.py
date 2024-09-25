@@ -1,7 +1,7 @@
+import asyncio
 import functools
 import logging
 import sys
-import time
 from pathlib import Path
 
 import psutil
@@ -21,11 +21,10 @@ FILETYPES = (".png", ".jpg", "jpeg")
 
 def server_not_found(func):
     @functools.wraps(func)
-    def handle_not_found_errors(*args, **kwargs):
+    async def handle_not_found_errors(*args, **kwargs):
         """handle server not found errors"""
         try:
-            value = func(*args, **kwargs)
-            return value
+            return await func(*args, **kwargs)
         except ServerNotFound as e:
             logger.critical(e.message)
             sys.exit(1)
@@ -34,7 +33,7 @@ def server_not_found(func):
 
 
 @server_not_found
-def set_backlight(colour: str, brightness: str, dial: DialType | None) -> None:
+async def set_backlight(colour: str, brightness: str, dial: DialType | None) -> None:
     """Set backlight colour and brightness for a dial
 
     :param colour: Pre-set colour to set dial to, defaults to WHITE.
@@ -47,20 +46,20 @@ def set_backlight(colour: str, brightness: str, dial: DialType | None) -> None:
     if not dial:
         for type in DialType:
             try:
-                client.set_backlight(type, adj_colour)
+                await client.set_backlight(type, adj_colour)
                 logger.debug(f"{type.value} backlight set to {colour}")
             except DialNotImplemented:
                 logger.warning(f"{type.value} backlight not set: dial not found")
     else:
         try:
-            client.set_backlight(DialType(dial), adj_colour)
+            await client.set_backlight(DialType(dial), adj_colour)
             logger.debug(f"{dial} backlight set to {colour}")
         except DialNotImplemented:
             logger.error(f"{dial} backlight not set: dial not found")
 
 
 @server_not_found
-def set_image(filename: str, dial: DialType) -> None:
+async def set_image(filename: str, dial: DialType) -> None:
     """Set the image for a dial
 
     :param dial: :param dial: Dial to set
@@ -72,14 +71,14 @@ def set_image(filename: str, dial: DialType) -> None:
     assert (width * height) == (200 * 144), "image must be exactly 144 x 200 pixels"
 
     try:
-        client.set_image(dial, Path(filename))
+        await client.set_image(dial, Path(filename))
         logger.debug(f"{dial} image set to {filename}")
     except DialNotImplemented:
         logger.error(f"{dial} image not set: dial not found")
 
 
 @server_not_found
-def start_monitoring(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool, auto: bool) -> None:
+async def start_monitoring(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool, auto: bool) -> None:
     """Start VU1-Monitoring
 
     :param interval: Wait interval between each update (seconds)
@@ -102,20 +101,20 @@ def start_monitoring(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool, 
         try:
             if cpu or (auto and client.check_dial(DialType.CPU)):
                 cpu_percent = int(psutil.cpu_percent())
-                client.set_dial(DialType.CPU, cpu_percent)
+                await client.set_dial(DialType.CPU, cpu_percent)
 
             if gpu or (auto and client.check_dial(DialType.GPU)):
                 gpu_percent = int(get_gpu_utilisation(settings.gpu.backend))
-                client.set_dial(DialType.GPU, gpu_percent)
+                await client.set_dial(DialType.GPU, gpu_percent)
 
             if mem or (auto and client.check_dial(DialType.MEMORY)):
                 memory_percent = int(psutil.virtual_memory().percent)
-                client.set_dial(DialType.MEMORY, memory_percent)
+                await client.set_dial(DialType.MEMORY, memory_percent)
 
             if net or (auto and client.check_dial(DialType.NETWORK)):
                 bytes_recv_updated = psutil.net_io_counters().bytes_recv
                 mb_rev = (bytes_recv_updated - bytes_recv) / (1024 * 1024)
-                client.set_dial(DialType.NETWORK, int(mb_rev))
+                await client.set_dial(DialType.NETWORK, int(mb_rev))
                 bytes_recv = bytes_recv_updated
 
         except DialNotImplemented as e:
@@ -123,11 +122,11 @@ def start_monitoring(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool, 
             sys.exit(1)
 
         logger.debug("update successful")
-        time.sleep(interval)
+        await asyncio.sleep(interval)
 
 
 @server_not_found
-def reset_dials(element: Element) -> None:
+async def reset_dials(element: Element) -> None:
     """reset all dials
 
     :element: Dial element to reset
@@ -135,9 +134,9 @@ def reset_dials(element: Element) -> None:
     client = VU1Client(settings.server.hostname, settings.server.port, settings.server.key)
     match element:
         case Element.DIAL:
-            client.reset_dials()
+            await client.reset_dials()
         case Element.BACKLIGHT:
-            client.reset_backlights()
+            await client.reset_backlights()
         case Element.IMAGE:
             extract_tarfile(Path("src/vu1_monitor/static/static.tgz"))
-            client.reset_images()
+            await client.reset_images()
