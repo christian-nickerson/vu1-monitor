@@ -53,7 +53,7 @@ vu1-monitor start
 vu1-monitor start
 
 # stop monitoring all available dials
-vu1-monitor stop 
+vu1-monitor stop
 ```
 
 `start` will automatically detect what dials can be updated based on their name.
