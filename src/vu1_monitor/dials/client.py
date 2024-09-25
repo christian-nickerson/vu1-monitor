@@ -5,6 +5,7 @@ from typing import Any, Callable
 
 import httpx
 
+from vu1_monitor.config import settings
 from vu1_monitor.exceptions.dials import (
     DialNotFound,
     DialNotImplemented,
@@ -105,7 +106,7 @@ class VU1Client:
         self.__dials: dict = dials
         return dials
 
-    @sync_handler(5)
+    @sync_handler(settings.server.timeouts.retries, settings.server.timeouts.sleep)
     def get_dials(self) -> list[dict]:
         """get list of all available dials"""
         with httpx.Client(base_url=self.__addr, params=self.__auth) as client:
@@ -116,7 +117,7 @@ class VU1Client:
 
         return response.json()["data"]
 
-    @async_handler(5)
+    @async_handler(settings.server.timeouts.retries, settings.server.timeouts.sleep)
     async def set_dial(self, dial: DialType, value: int) -> dict:
         """Set the value of a dial
 
@@ -143,7 +144,7 @@ class VU1Client:
         for dial in self.__dials:
             await self.set_dial(dial, 0)
 
-    @async_handler(5)
+    @async_handler(settings.server.timeouts.retries, settings.server.timeouts.sleep)
     async def set_backlight(self, dial: DialType, colour: tuple[int, ...]) -> dict:
         """Set backlight colour of a dial
 
@@ -171,7 +172,7 @@ class VU1Client:
         for dial in self.__dials:
             await self.set_backlight(dial, (0, 0, 0))
 
-    @async_handler(5)
+    @async_handler(settings.server.timeouts.retries, settings.server.timeouts.sleep)
     async def set_image(self, dial: DialType, image_path: Path) -> dict:
         """Set an image for a dial
 

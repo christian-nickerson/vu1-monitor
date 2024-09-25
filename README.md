@@ -117,9 +117,11 @@ vu1-monitor reset image
 | :--- | :--- | :--- |
 | `VU1__NAME` | The name of the application | `VU1-Monitor` |
 | `VU1__SERVER__HOSTNAME` | The hostname of the VU-Server | `localhost` |
-| `VU1__SERVER__PORT` | The port of the VU-Server | 5430 |
+| `VU1__SERVER__PORT` | The port of the VU-Server | `5430` |
 | `VU1__SERVER__LOGGING_LEVEL` | The logging level of VU1-Monitor | `INFO` |
 | `VU1__SERVER__KEY` | The API key to authenticate with VU-Server. The default value is the default value of VU-Server, please generate a new key in the VU UI Console and set as your new key | `cTpAWYuRpA2zx75Yh961Cg` |
+| `VU1__SERVER__TIMEOUTS__RETRIES` | Number of retries to attempt on server timeout | `5` |
+| `VU1__SERVER__TIMEOUTS__SLEEP` | Number of seconds to wait before retry attempt | `2` |
 | `VU1__CPU__NAME` | The name of the Dial assigned to CPU monitoring | `CPU` |
 | `VU1__GPU__NAME` | The name of the Dial assigned to GPU monitoring | `GPU` |
 | `VU1__GPU__BACKEND` | The device type of the GPU. Valid values are: `nvidia`, `amd` | `nvidia` |

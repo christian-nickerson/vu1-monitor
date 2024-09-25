@@ -17,6 +17,9 @@ settings = Dynaconf(
         Validator("server.port", default=5340),
         Validator("server.logging_level", default="INFO"),
         Validator("server.key", default="cTpAWYuRpA2zx75Yh961Cg"),
+        # timeouts
+        Validator("server.timeouts.retries", default=5),
+        Validator("server.timeouts.sleep", default=2),
         # dials
         Validator("cpu.name", default="CPU"),
         Validator("gpu.name", default="GPU"),
