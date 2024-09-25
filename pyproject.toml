@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vu1-monitor"
-version = "0.0.3"
+version = "0.1.0"
 description = "A CLI application for monitoring hardware with VU1-Dials"
 authors = ["Christian Nickerson <christian_nickerson@hotmail.com>"]
 license = "Apache Licence 2.0"
