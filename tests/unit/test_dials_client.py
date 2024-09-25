@@ -5,7 +5,7 @@ import pytest
 from httpx import HTTPError
 from pytest_httpx import HTTPXMock
 
-from vu1_monitor.dials.client import VU1Client, server_handler
+from vu1_monitor.dials.client import VU1Client, async_handler, sync_handler
 from vu1_monitor.exceptions.dials import (
     DialNotFound,
     DialNotImplemented,
@@ -30,12 +30,12 @@ def client_loaded(httpx_mock: HTTPXMock, dial_body: dict) -> VU1Client:
 ##################################
 
 
-def test_server_conn_error(httpx_mock: HTTPXMock) -> None:
-    """test server_conn handles connection errors correctly"""
+def test_sync_conn_error(httpx_mock: HTTPXMock) -> None:
+    """test sync_handler handles connection errors correctly"""
     httpx_mock.add_exception(httpx.ConnectError("test"))
     httpx_mock.add_response()
 
-    @server_handler()
+    @sync_handler()
     def request_test():
         with httpx.Client() as client:
             return client.get("http://test")
@@ -44,18 +44,49 @@ def test_server_conn_error(httpx_mock: HTTPXMock) -> None:
         request_test()
 
 
-def test_server_timeout_error(httpx_mock: HTTPXMock) -> None:
-    """test server_conn handles timeout errors correctly"""
+@pytest.mark.asyncio
+async def test_async_conn_error(httpx_mock: HTTPXMock) -> None:
+    """test async_handler handles connection errors correctly"""
+    httpx_mock.add_exception(httpx.ConnectError("test"))
+    httpx_mock.add_response()
+
+    @async_handler()
+    async def request_test():
+        async with httpx.AsyncClient() as client:
+            return await client.get("http://test")
+
+    with pytest.raises(ServerNotFound):
+        await request_test()
+
+
+def test_sync_timeout_error(httpx_mock: HTTPXMock) -> None:
+    """test sync_handler handles timeout errors correctly"""
     for _ in range(2):
         httpx_mock.add_exception(httpx.TimeoutException("test"))
     httpx_mock.add_response(status_code=200)
 
-    @server_handler(2)
+    @sync_handler(2)
     def request_test():
         with httpx.Client() as client:
             return client.get("http://test")
 
     response = request_test()
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_async_timeout_error(httpx_mock: HTTPXMock) -> None:
+    """test async_handler handles timeout errors correctly"""
+    for _ in range(2):
+        httpx_mock.add_exception(httpx.TimeoutException("test"))
+    httpx_mock.add_response(status_code=200)
+
+    @async_handler(2)
+    async def request_test():
+        async with httpx.AsyncClient() as client:
+            return await client.get("http://test")
+
+    response = await request_test()
     assert response.status_code == 200
 
 
@@ -124,14 +155,16 @@ def test_check_dial_not_exists(httpx_mock: HTTPXMock, client_loaded: VU1Client):
 ######################
 
 
-def test_set_dial(httpx_mock: HTTPXMock, client_loaded: VU1Client, value_body: dict):
+@pytest.mark.asyncio
+async def test_set_dial(httpx_mock: HTTPXMock, client_loaded: VU1Client, value_body: dict):
     """test set_dial returns correctly"""
     httpx_mock.add_response(json=value_body)
-    response = client_loaded.set_dial(DialType.CPU, 50)
+    response = await client_loaded.set_dial(DialType.CPU, 50)
     assert response == value_body
 
 
-def test_set_dial_no_dials(
+@pytest.mark.asyncio
+async def test_set_dial_no_dials(
     httpx_mock: HTTPXMock,
     client_loaded: VU1Client,
     value_body: dict,
@@ -141,14 +174,15 @@ def test_set_dial_no_dials(
     httpx_mock.add_response(json=value_body)
     client_loaded.dials.pop(DialType.CPU.value, None)
     with pytest.raises(DialNotImplemented):
-        client_loaded.set_dial(DialType.CPU, 50)
+        await client_loaded.set_dial(DialType.CPU, 50)
 
 
-def test_set_dial_non_200(httpx_mock: HTTPXMock, client_loaded: VU1Client, value_body: dict):
+@pytest.mark.asyncio
+async def test_set_dial_non_200(httpx_mock: HTTPXMock, client_loaded: VU1Client, value_body: dict):
     """test set_dial call fails correctly"""
     httpx_mock.add_response(status_code=400, json=value_body)
     with pytest.raises(HTTPError):
-        client_loaded.set_dial(DialType.CPU, 50)
+        await client_loaded.set_dial(DialType.CPU, 50)
 
 
 ###########################
@@ -156,14 +190,16 @@ def test_set_dial_non_200(httpx_mock: HTTPXMock, client_loaded: VU1Client, value
 ###########################
 
 
-def test_set_backlight(httpx_mock: HTTPXMock, client_loaded: VU1Client, backlight_body: dict):
+@pytest.mark.asyncio
+async def test_set_backlight(httpx_mock: HTTPXMock, client_loaded: VU1Client, backlight_body: dict):
     """test set_backlight returns correctly"""
     httpx_mock.add_response(json=backlight_body)
-    response = client_loaded.set_backlight(DialType.CPU, (50, 50, 50))
+    response = await client_loaded.set_backlight(DialType.CPU, (50, 50, 50))
     assert response == backlight_body
 
 
-def test_set_backlight_no_dials(
+@pytest.mark.asyncio
+async def test_set_backlight_no_dials(
     httpx_mock: HTTPXMock,
     client_loaded: VU1Client,
     backlight_body: dict,
@@ -173,14 +209,15 @@ def test_set_backlight_no_dials(
     httpx_mock.add_response(json=backlight_body)
     client_loaded.dials.pop(DialType.CPU.value, None)
     with pytest.raises(DialNotImplemented):
-        client_loaded.set_backlight(DialType.CPU, (50, 50, 50))
+        await client_loaded.set_backlight(DialType.CPU, (50, 50, 50))
 
 
-def test_set_backlight_non_200(httpx_mock: HTTPXMock, client_loaded: VU1Client, backlight_body: dict):
+@pytest.mark.asyncio
+async def test_set_backlight_non_200(httpx_mock: HTTPXMock, client_loaded: VU1Client, backlight_body: dict):
     """test set_backlight call raises HTTPError on non-200"""
     httpx_mock.add_response(status_code=400, json=backlight_body)
     with pytest.raises(HTTPError):
-        client_loaded.set_backlight(DialType.CPU, (50, 50, 50))
+        await client_loaded.set_backlight(DialType.CPU, (50, 50, 50))
 
 
 #######################
@@ -188,14 +225,16 @@ def test_set_backlight_non_200(httpx_mock: HTTPXMock, client_loaded: VU1Client, 
 #######################
 
 
-def test_set_image(httpx_mock: HTTPXMock, client_loaded: VU1Client, image_body: dict, image_file: Path):
+@pytest.mark.asyncio
+async def test_set_image(httpx_mock: HTTPXMock, client_loaded: VU1Client, image_body: dict, image_file: Path):
     """test set_image returns correctly"""
     httpx_mock.add_response(json=image_body)
-    response = client_loaded.set_image(DialType.CPU, image_file)
+    response = await client_loaded.set_image(DialType.CPU, image_file)
     assert response == image_body
 
 
-def test_set_image_no_dials(
+@pytest.mark.asyncio
+async def test_set_image_no_dials(
     httpx_mock: HTTPXMock,
     client_loaded: VU1Client,
     image_body: dict,
@@ -206,11 +245,12 @@ def test_set_image_no_dials(
     httpx_mock.add_response(json=image_body)
     client_loaded.dials.pop(DialType.CPU.value, None)
     with pytest.raises(DialNotImplemented):
-        client_loaded.set_image(DialType.CPU, image_file)
+        await client_loaded.set_image(DialType.CPU, image_file)
 
 
-def test_set_image_non_200(httpx_mock: HTTPXMock, client_loaded: VU1Client, image_body: dict, image_file: Path):
+@pytest.mark.asyncio
+async def test_set_image_non_200(httpx_mock: HTTPXMock, client_loaded: VU1Client, image_body: dict, image_file: Path):
     """test set_image call raises HTTPError on non-200"""
     httpx_mock.add_response(status_code=400, json=image_body)
     with pytest.raises(HTTPError):
-        client_loaded.set_image(DialType.CPU, image_file)
+        await client_loaded.set_image(DialType.CPU, image_file)

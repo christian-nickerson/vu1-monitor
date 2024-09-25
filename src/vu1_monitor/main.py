@@ -1,3 +1,5 @@
+import asyncio
+
 import click
 
 from vu1_monitor.config import settings
@@ -30,7 +32,7 @@ def main() -> None:
 @click.option("--dial", "-d", default=None, type=DialType)
 def backlight(colour: str, brightness: str, dial: DialType | None) -> None:
     """set backlight of a dial"""
-    set_backlight(colour, brightness, dial)
+    asyncio.run(set_backlight(colour, brightness, dial))
 
 
 @main.command(help="set the image of a dial")
@@ -38,14 +40,14 @@ def backlight(colour: str, brightness: str, dial: DialType | None) -> None:
 @click.option("--dial", "-d", required=True, type=DialType)
 def image(filename: str, dial: DialType) -> None:
     """Set the image for a dial"""
-    set_image(filename, dial)
+    asyncio.run(set_image(filename, dial))
 
 
 @main.command(help="reset all dials to default")
 @click.argument("element", type=Element, required=True)
 def reset(element: Element) -> None:
     """reset all dials"""
-    reset_dials(element)
+    asyncio.run(reset_dials(element))
 
 
 @main.command(help="run monitoring")
@@ -57,7 +59,7 @@ def reset(element: Element) -> None:
 @click.option("--net/--no-net", default=False, help=f"update {DialType.NETWORK.value} dial")
 def run(interval: int, cpu: bool, gpu: bool, mem: bool, net: bool, auto: bool) -> None:
     """Run VU1-Monitoring"""
-    start_monitoring(interval, cpu, gpu, mem, net, auto)
+    asyncio.run(start_monitoring(interval, cpu, gpu, mem, net, auto))
 
 
 @main.command(help="start monitoring in background (auto checks for dials)")
@@ -72,7 +74,7 @@ def start(interval: int) -> None:
 def stop() -> None:
     """Stop VU1-Monitoring"""
     stop_pid()
-    reset_dials(Element.DIAL)
+    asyncio.run(reset_dials(Element.DIAL))
 
 
 if __name__ == "__main__":
